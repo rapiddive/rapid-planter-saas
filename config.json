@@ -10,7 +10,7 @@
           "Magento-Store-View-Code": "default",
           "Magento-Website-Code": "base",
           "x-api-key": "",
-          "Magento-Environment-Id": ""
+          "Magento-Environment-Id": "8TaAW1cW7ifnzGmbKHsfD9"
         }
       },
       "analytics": {
@@ -18,7 +18,7 @@
         "environment": "Production",
         "store-id": 1,
         "store-name": "Main Website Store",
-        "store-url": "https://planter.rapidive.in",
+        "store-url": "https://main--rapid-planter-saas--rapiddive.aem.page",
         "store-view-id": 1,
         "store-view-name": "Default Store View",
         "website-id": 1,
