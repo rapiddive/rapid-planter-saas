@@ -1,16 +1,16 @@
 {
   "version": 1,
   "code": {
-    "owner": "rapiddive",
-    "repo": "rapid-planter-saas",
+    "owner": "{ORG}",
+    "repo": "{REPO}",
     "source": {
       "type": "github",
-      "url": "https://github.com/rapiddive/rapid-planter-saas"
+      "url": "https://github.com/{ORG}/{REPO}"
     }
   },
   "content": {
     "source": {
-      "url": "https://adobe.sharepoint.com/:f:/r/sites/vinshah/Shared%20Documents/rapid-planter-saas",
+      "url": "{CONTENT_SOURCE}",
       "type": "onedrive"
     }
   },
@@ -19,45 +19,45 @@
   },
   "cdn": {
     "live": {
-      "host": "main--rapid-planter-saas--rapiddive.aem.live"
+      "host": "main--{SITE}--{ORG}.aem.live"
     },
     "preview": {
-      "host": "main--rapid-planter-saas--rapiddive.aem.page"
+      "host": "main--{SITE}--{ORG}.aem.page"
     }
   },
   "headers": {},
   "public": {
     "default": {
-      "commerce-core-endpoint": "https://na1-sandbox.api.commerce.adobe.com/8TaAW1cW7ifnzGmbKHsfD9/graphql",
-      "commerce-endpoint": "https://na1-sandbox.api.commerce.adobe.com/8TaAW1cW7ifnzGmbKHsfD9/graphql",
+      "commerce-core-endpoint": "{ENDPOINT}",
+      "commerce-endpoint": "{CS_ENDPOINT}",
       "headers": {
         "cs": {
           "Magento-Customer-Group": "b6589fc6ab0dc82cf12099d1c2d40ab994e8410c",
-          "Magento-Store-Code": "main_website_store",
-          "Magento-Store-View-Code": "default",
-          "Magento-Website-Code": "base",
-          "x-api-key": "",
-          "Magento-Environment-Id": "8TaAW1cW7ifnzGmbKHsfD9"
+          "Magento-Store-Code": "{STORE_CODE}",
+          "Magento-Store-View-Code": "{STORE_VIEW_CODE}",
+          "Magento-Website-Code": "{WEBSITE_CODE}",
+          "x-api-key": "{COMMERCE_API_KEY}",
+          "Magento-Environment-Id": "{COMMERCE_ENVIRONMENT_ID}"
         }
       },
       "analytics": {
         "base-currency-code": "USD",
         "environment": "Production",
-        "store-id": "1",
+        "store-id": "{STORE_ID}",
         "store-name": "Main Website Store",
-        "store-url": "https://main--rapid-planter-saas--rapiddive.aem.live",
-        "store-view-id": "1",
+        "store-url": "{DOMAIN}",
+        "store-view-id": "{STORE_VIEW_ID}",
         "store-view-name": "Default Store View",
-        "website-id": "1",
+        "website-id": "{WEBSITE_ID}",
         "website-name": "Main Website"
       }
     }
   },
   "robots": {
-    "txt": "User-agent: *\nAllow: /\nDisallow: /drafts/\nDisallow: /enrichment/\nDisallow: /tools/\nDisallow: /plugins/experimentation/\n\nSitemap: https://planter.rapidive.in/sitemap-index.xml"
+    "txt": "User-agent: *\nAllow: /\nDisallow: /drafts/\nDisallow: /enrichment/\nDisallow: /tools/\nDisallow: /plugins/experimentation/\n\nSitemap: https://{DOMAIN}/sitemap-index.xml"
   },
   "sidekick": {
-    "project": "RAPID PLANTER SaaS",
+    "project": "Boilerplate",
     "plugins": [
       {
         "id": "cif",
@@ -65,7 +65,7 @@
         "environments": [
           "edit"
         ],
-        "url": "https://main--rapid-planter-saas--rapiddive.aem.live/tools/picker/dist/index.html",
+        "url": "https://main--{SITE}--{ORG}.aem.live/tools/picker/dist/index.html",
         "isPalette": true,
         "paletteRect": "top: 54px; left: 5px; bottom: 5px; width: 300px; height: calc(100% - 59px); border-radius: var(--hlx-sk-button-border-radius); overflow: hidden; resize: horizontal;"
       },
@@ -75,7 +75,7 @@
         "environments": [
           "edit"
         ],
-        "url": "https://main--rapid-planter-saas--rapiddive.aem.live/tools/segments/dist/index.html",
+        "url": "https://main--{SITE}--{ORG}.aem.live/tools/segments/dist/index.html",
         "isPalette": true,
         "paletteRect": "top: 54px; left: 5px; bottom: 5px; width: 300px; height: calc(100% - 59px); border-radius: var(--hlx-sk-button-border-radius); overflow: hidden; resize: horizontal;"
       }
@@ -85,7 +85,7 @@
     "admin": {
       "role": {
         "config_admin": [
-          "vinshah@adobe.com"
+          "{ADMIN_USER_EMAIL}"
         ]
       },
       "requireAuth": "auto"

@@ -1,5 +1,5 @@
 mountpoints:
-  /: https://adobe.sharepoint.com/:f:/r/sites/vinshah/Shared%20Documents/rapid-planter-saas
+  /: {YOUR_MOUNTPOINT_URL}
 
 folders:
   /products/: /products/default
