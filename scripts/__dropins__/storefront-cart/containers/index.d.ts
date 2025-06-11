@@ -22,6 +22,4 @@ export * from './OrderSummary';
 export * from './EmptyCart';
 export * from './Coupons';
 export * from './OrderSummaryLine';
-export * from './GiftCards';
-export * from './GiftOptions';
 //# sourceMappingURL=index.d.ts.map

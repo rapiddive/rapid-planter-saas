@@ -29,7 +29,4 @@ export * from './refreshCart';
 export { getPersistedCartData as getCartDataFromCache } from '../lib/persisted-data';
 export * from './applyCouponsToCart';
 export * from './publishShoppingCartViewEvent';
-export * from './applyGiftCardToCart';
-export * from './removeGiftCardFromCart';
-export * from './setGiftOptionsOnCart';
 //# sourceMappingURL=index.d.ts.map

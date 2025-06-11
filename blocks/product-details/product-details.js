@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 
 import {
-  InLineAlert,
+  // InLineAlert,
   Icon,
   Button,
   provider as UI,
@@ -21,16 +21,17 @@ import ProductAttributes from '@dropins/storefront-pdp/containers/ProductAttribu
 import ProductGallery from '@dropins/storefront-pdp/containers/ProductGallery.js';
 
 // Libs
-import { fetchPlaceholders, setJsonLd } from '../../scripts/commerce.js';
+import { setJsonLd } from '../../scripts/commerce.js';
+// import { fetchPlaceholders } from '../../scripts/aem.js';
 
 // Initializers
 import { IMAGES_SIZES } from '../../scripts/initializers/pdp.js';
 import '../../scripts/initializers/cart.js';
-import { rootLink } from '../../scripts/scripts.js';
 
 export default async function decorate(block) {
-  const product = events.lastPayload('pdp/data') ?? null;
-  const labels = await fetchPlaceholders();
+  // eslint-disable-next-line no-underscore-dangle
+  const product = events._lastEvent?.['pdp/data']?.payload ?? null;
+  // const labels = await fetchPlaceholders();
 
   // Layout
   const fragment = document.createRange().createContextualFragment(`
@@ -58,7 +59,7 @@ export default async function decorate(block) {
     </div>
   `);
 
-  const $alert = fragment.querySelector('.product-details__alert');
+  // const $alert = fragment.querySelector('.product-details__alert');
   const $gallery = fragment.querySelector('.product-details__gallery');
   const $header = fragment.querySelector('.product-details__header');
   const $price = fragment.querySelector('.product-details__price');
@@ -67,14 +68,14 @@ export default async function decorate(block) {
   const $options = fragment.querySelector('.product-details__options');
   const $quantity = fragment.querySelector('.product-details__quantity');
   const $addToCart = fragment.querySelector('.product-details__buttons__add-to-cart');
-  const $addToWishlist = fragment.querySelector('.product-details__buttons__add-to-wishlist');
+  // const $addToWishlist = fragment.querySelector('.product-details__buttons__add-to-wishlist');
   const $description = fragment.querySelector('.product-details__description');
   const $attributes = fragment.querySelector('.product-details__attributes');
 
   block.appendChild(fragment);
 
   // Alert
-  let inlineAlert = null;
+  // let inlineAlert = null;
 
   // Render Containers
   const [
@@ -86,7 +87,7 @@ export default async function decorate(block) {
     _options,
     _quantity,
     addToCart,
-    addToWishlist,
+    // addToWishlist,
     _description,
     _attributes,
   ] = await Promise.all([
@@ -131,86 +132,86 @@ export default async function decorate(block) {
 
     // Configuration – Button - Add to Cart
     UI.render(Button, {
-      children: labels.PDP?.Product?.AddToCart?.label,
+      children: 'Contact Us: 585-XXX-XXXX', // labels.PDP?.Product?.AddToCart?.label,
       icon: Icon({ source: 'Cart' }),
-      onClick: async () => {
-        try {
-          addToCart.setProps((prev) => ({
-            ...prev,
-            children: labels.Custom?.AddingToCart?.label,
-            disabled: true,
-          }));
+      // onClick: async () => {
+      //   try {
+      //     addToCart.setProps((prev) => ({
+      //       ...prev,
+      //       children: labels.Custom?.AddingToCart?.label,
+      //       disabled: true,
+      //     }));
 
-          // get the current selection values
-          const values = pdpApi.getProductConfigurationValues();
-          const valid = pdpApi.isProductConfigurationValid();
+      //     // get the current selection values
+      //     const values = pdpApi.getProductConfigurationValues();
+      //     const valid = pdpApi.isProductConfigurationValid();
 
-          // add the product to the cart
-          if (valid) {
-            const { addProductsToCart } = await import('@dropins/storefront-cart/api.js');
-            await addProductsToCart([{ ...values }]);
-          }
+      //     // add the product to the cart
+      //     if (valid) {
+      //       const { addProductsToCart } = await import('@dropins/storefront-cart/api.js');
+      //       await addProductsToCart([{ ...values }]);
+      //     }
 
-          // reset any previous alerts if successful
-          inlineAlert?.remove();
-        } catch (error) {
-          // add alert message
-          inlineAlert = await UI.render(InLineAlert, {
-            heading: 'Error',
-            description: error.message,
-            icon: Icon({ source: 'Warning' }),
-            'aria-live': 'assertive',
-            role: 'alert',
-            onDismiss: () => {
-              inlineAlert.remove();
-            },
-          })($alert);
+      //     // reset any previous alerts if successful
+      //     inlineAlert?.remove();
+      //   } catch (error) {
+      //     // add alert message
+      //     inlineAlert = await UI.render(InLineAlert, {
+      //       heading: 'Error',
+      //       description: error.message,
+      //       icon: Icon({ source: 'Warning' }),
+      //       'aria-live': 'assertive',
+      //       role: 'alert',
+      //       onDismiss: () => {
+      //         inlineAlert.remove();
+      //       },
+      //     })($alert);
 
-          // Scroll the alertWrapper into view
-          $alert.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          });
-        } finally {
-          addToCart.setProps((prev) => ({
-            ...prev,
-            children: labels.PDP?.Product?.AddToCart?.label,
-            disabled: false,
-          }));
-        }
-      },
+      //     // Scroll the alertWrapper into view
+      //     $alert.scrollIntoView({
+      //       behavior: 'smooth',
+      //       block: 'center',
+      //     });
+      //   } finally {
+      //     addToCart.setProps((prev) => ({
+      //       ...prev,
+      //       children: labels.PDP?.Product?.AddToCart?.label,
+      //       disabled: false,
+      //     }));
+      //   }
+      // },
     })($addToCart),
 
     // Configuration - Add to Wishlist
-    UI.render(Button, {
-      icon: Icon({ source: 'Heart' }),
-      variant: 'secondary',
-      'aria-label': labels.Custom?.AddToWishlist?.label,
-      onClick: async () => {
-        try {
-          addToWishlist.setProps((prev) => ({
-            ...prev,
-            disabled: true,
-            'aria-label': labels.Custom?.AddingToWishlist?.label,
-          }));
+    // UI.render(Button, {
+    //   icon: Icon({ source: 'Heart' }),
+    //   variant: 'secondary',
+    //   'aria-label': labels.Custom?.AddToWishlist?.label,
+    //   onClick: async () => {
+    //     try {
+    //       addToWishlist.setProps((prev) => ({
+    //         ...prev,
+    //         disabled: true,
+    //         'aria-label': labels.Custom?.AddingToWishlist?.label,
+    //       }));
 
-          const values = pdpApi.getProductConfigurationValues();
+    //       const values = pdpApi.getProductConfigurationValues();
 
-          if (values?.sku) {
-            const wishlist = await import('../../scripts/wishlist/api.js');
-            await wishlist.addToWishlist(values.sku);
-          }
-        } catch (error) {
-          console.error(error);
-        } finally {
-          addToWishlist.setProps((prev) => ({
-            ...prev,
-            disabled: false,
-            'aria-label': labels.Custom?.AddToWishlist?.label,
-          }));
-        }
-      },
-    })($addToWishlist),
+    //       if (values?.sku) {
+    //         const wishlist = await import('../../scripts/wishlist/api.js');
+    //         await wishlist.addToWishlist(values.sku);
+    //       }
+    //     } catch (error) {
+    //       console.error(error);
+    //     } finally {
+    //       addToWishlist.setProps((prev) => ({
+    //         ...prev,
+    //         disabled: false,
+    //         'aria-label': labels.Custom?.AddToWishlist?.label,
+    //       }));
+    //     }
+    //   },
+    // })($addToWishlist),
 
     // Description
     pdpRendered.render(ProductDescription, {})($description),
@@ -226,13 +227,17 @@ export default async function decorate(block) {
   }, { eager: true });
 
   // Set JSON-LD and Meta Tags
-  events.on('aem/lcp', () => {
-    if (product) {
-      setJsonLdProduct(product);
-      setMetaTags(product);
-      document.title = product.name;
-    }
-  }, { eager: true });
+  events.on(
+    'eds/lcp',
+    () => {
+      if (product) {
+        setJsonLdProduct(product);
+        setMetaTags(product);
+        document.title = product.name;
+      }
+    },
+    { eager: true },
+  );
 
   return Promise.resolve();
 }
@@ -292,9 +297,9 @@ async function setJsonLdProduct(product) {
       '@type': 'Brand',
       name: brand?.value,
     },
-    url: new URL(rootLink(`/products/${urlKey}/${sku}`), window.location),
+    url: new URL(`/products/${urlKey}/${sku}`, window.location),
     sku,
-    '@id': new URL(rootLink(`/products/${urlKey}/${sku}`), window.location),
+    '@id': new URL(`/products/${urlKey}/${sku}`, window.location),
   };
 
   if (variants.length > 1) {

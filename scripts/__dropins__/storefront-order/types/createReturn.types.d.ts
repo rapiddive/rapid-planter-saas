@@ -1,7 +1,6 @@
 import { AttributesFormModel, OrderDataModel, OrderItemModel } from '../data/models';
 import { InLineAlertProps, TaxTypes } from '.';
 import { SlotProps } from '@dropins/tools/types/elsie/src/lib';
-import { ImageProps } from '@dropins/tools/types/elsie/src/components';
 import { RefObject } from 'preact';
 import { MutableRefObject } from 'preact/compat';
 
@@ -20,14 +19,6 @@ export interface CreateReturnProps {
         ReturnFormActions: SlotProps<{
             handleChangeStep: (value: StepsTypes) => void;
         }>;
-        ReturnReasonFormImage?: SlotProps<{
-            data: OrderItemModel;
-            defaultImageProps: ImageProps;
-        }>;
-        CartSummaryItemImage?: SlotProps<{
-            data: OrderItemModel;
-            defaultImageProps: ImageProps;
-        }>;
     };
     className: string;
     onSuccess?: (response: onSuccessTypes | {}) => void;
@@ -39,10 +30,6 @@ export interface ReturnOrderProductListProps {
     placeholderImage: string;
     slots?: {
         ReturnOrderItem: SlotProps;
-        CartSummaryItemImage?: SlotProps<{
-            data: OrderItemModel;
-            defaultImageProps: ImageProps;
-        }>;
     };
     itemsEligibleForReturn: OrderItemModel[];
     loading: boolean;
@@ -59,10 +46,6 @@ export interface ReturnReasonFormProps {
     slots?: {
         ReturnFormActions: SlotProps<{
             handleChangeStep: (value: StepsTypes) => void;
-        }>;
-        ReturnReasonFormImage?: SlotProps<{
-            data: OrderItemModel;
-            defaultImageProps: ImageProps;
         }>;
     };
     formsRef: MutableRefObject<RefObject<HTMLFormElement>[]>;

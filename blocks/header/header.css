@@ -1,12 +1,10 @@
 /* stylelint-disable selector-class-pattern */
 
-:root {
-  --desktop-item-panel-max-width: 300px;
-  --desktop-item-panel-min-width: 200px;
-  --desktop-large-panel-width: 900px;
-  --desktop-panel-min-height: 200px;
-  --desktop-panel-max-height: 600px;
-}
+/* :root {
+  --megamenu-item-width: 300px;
+  --megamenu-panel-width: 900px;
+  --megamenu-panel-height: 500px;
+} */
 
 /* header and nav layout */
 header .nav-wrapper {
@@ -15,6 +13,28 @@ header .nav-wrapper {
   z-index: 3;
   position: fixed;
   border-bottom: 1px solid var(--color-neutral-300);
+}
+
+header .arkbridge{
+  background: linear-gradient(90deg, rgb(247 247 179 / 81.7%) 0%, rgb(244 204 60 / 100%) 32%, rgb(250 252 252 / 0%) 65%);
+}
+
+header .kingsbluff{
+  background: linear-gradient(90deg, rgb(84 84 84 / 81.7%) 0%, rgb(212 215 212 / 100%) 22%, rgb(250 252 252 / 0%) 65%);
+}
+
+header .celport{
+  background: linear-gradient(90deg, rgb(237 237 234 / 81.7%) 0%, rgb(117 187 123 / 100%) 22%, rgb(250 252 252 / 0%) 65%);
+}
+
+header #clear-selections{
+  cursor: pointer;
+}
+
+header #clear-selections:hover{
+  cursor: pointer;
+
+  /* background-color: lightgray; */
 }
 
 header nav {
@@ -144,20 +164,15 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::after {
 }
 
 /* brand */
-header nav .nav-brand {
-  min-width: 128px;
-}
-
 header nav .nav-brand a {
   grid-area: brand;
   flex-basis: 128px;
   font: var(--type-headline-1-font);
   letter-spacing: var(--type-headline-1-letter-spacing);
-  font-weight: bold;
 }
 
 li.nav-drop img {
-  max-width: var(--desktop-item-panel-max-width);
+  max-width: var(--megamenu-item-width);
   width: 100%;
   height: auto;
   object-fit: contain;
@@ -180,35 +195,27 @@ header nav[aria-expanded='true'] .nav-sections {
   display: block;
   visibility: visible;
   align-self: start;
+  padding: 50px;
 }
 
 header nav .nav-sections ul {
-  font: var(--type-body-2-strong-font);
-  letter-spacing: var(--type-body-2-strong-letter-spacing);
   list-style: none;
   padding-left: 0;
+  font: var(--type-body-1-default-font);
+  letter-spacing: var(--type-body-1-default-letter-spacing);
 }
 
 header nav .nav-sections ul > li,
 header nav .nav-sections ul > li > a {
-  font: var(--type-body-2-strong-font);
-  letter-spacing: var(--type-body-2-strong-letter-spacing);
+  font-weight: 500;
 }
 
-header nav .nav-brand a:hover {
-  text-decoration: none;
-}
-
-header nav .nav-sections ul > li ul {
+header nav .nav-sections ul > li > ul {
   margin-top: 0;
 }
 
-header nav .nav-sections ul > li ul > li {
+header nav .nav-sections ul > li > ul > li {
   font-weight: 400;
-}
-
-header nav .nav-sections ul > li:empty {
-  display: none;
 }
 
 @media (width >= 900px) {
@@ -222,75 +229,101 @@ header nav .nav-sections ul > li:empty {
     align-self: unset;
   }
 
-  header .nav-drop {
-    align-self: center;
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li,
   header nav .nav-sections .nav-drop {
-    border-radius: 4px;
-    padding: 0 var(--spacing-small);
-  }
+    position: relative;
+    padding: 0 16px;
 
-  header nav .nav-sections .nav-drop {
+    /* padding: 10px 15px; */
     cursor: pointer;
+    border-radius: 4px;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li a {
-    text-decoration: none;
+  header nav .nav-sections .nav-drop[aria-expanded='true'] {
+    /* background-color: var(--color-neutral-200); */
+
+    /* padding: 10px 5px; */
+    padding: 0 16px;
+
+  }
+
+  header nav .nav-sections .nav-drop::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0.4rem;
+    right: 0.2rem;
+    transform: rotate(135deg);
+    width: 0.6rem;
+    height: 0.6rem;
+    border: 2px solid currentcolor;
+    border-radius: 0 1px 0 0;
+    border-width: 2px 2px 0 0;
+  }
+
+  header nav .nav-sections .nav-drop[aria-expanded='true']::after {
+    top: unset;
+    bottom: 0.5em;
+    transform: rotate(315deg);
   }
 
   header nav .nav-sections ul {
     display: flex;
-    gap: 24px;
+
+    /* gap: 24px; */
     margin: 0;
+
+    /* padding: 25px; */
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li ul {
+  header nav .nav-sections .default-content-wrapper > ul > li > ul {
     display: none;
     position: relative;
   }
 
-  header nav .nav-sections .nav-drop[aria-expanded='true'] ul {
+  header nav .nav-sections .nav-drop[aria-expanded='true'] > ul {
+    /* height: var(--megamenu-panel-height); */
     flex-flow: column wrap;
-    max-height: calc(var(--desktop-panel-max-height) - 2 * var(--spacing-xbig));
-    min-height: calc(var(--desktop-panel-min-height) - 2 * var(--spacing-xbig));
   }
+
 
   header nav .nav-sections .default-content-wrapper > ul > li {
     flex: 0 1 auto;
+    position: relative;
+    margin: 0 10px;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] .submenu-wrapper {
-    background-color: var(--color-neutral-50);
-    box-sizing: border-box;
-    left: 0;
-    max-height: var(--desktop-panel-max-height);
-    min-height: var(--desktop-panel-min-height);
-    padding: var(--spacing-xbig);
-    position: absolute;
-    top: var(--spacing-large);
-    width: 100%;
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li .submenu-header {
-    display: none;
-  }
-
-  header nav .nav-sections ul > li.nav-drop .submenu-title,
-  header nav .nav-sections ul > li.nav-drop .submenu-header * {
-    display: none;
-    font: var(--type-body-1-emphasized-font);
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] ul {
+  /* This is the style for the dropdown */
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > ul {
     display: flex;
-    margin: 0 auto;
-    overflow-x: auto;
-    width: var(--desktop-large-panel-width);
+    position: absolute;
+
+    /* left: -24px; */
+
+    /* width: var(--megamenu-panel-width); */
+    top: 150%;
+
+    /* padding: 16px; */
+    background-color: var(--color-neutral-50);
+
+    /* background-color: currentColor; */
+
+    white-space: initial;
+    overflow-x: scroll;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li ul::before {
+  header nav .nav-sections .default-content-wrapper > ul > li > ul > li {
+    padding: 8px 0;
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > ul > li {   
+    padding: 10px;
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > ul > li:hover {   
+    background-color: lightgray;
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li > ul::before {
     content: '';
     position: absolute;
     top: -8px;
@@ -302,15 +335,7 @@ header nav .nav-sections ul > li:empty {
     border-bottom: 8px solid var(--color-neutral-500);
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li ul > li {
-    min-width: var(--desktop-item-panel-min-width);
-    max-width: var(--desktop-item-panel-max-width);
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li:hover,
-  header nav .nav-sections .nav-drop[aria-expanded='true'] {
-    background-color: var(--color-neutral-200);
-  }
+  
 }
 
 /* tools */
@@ -548,16 +573,20 @@ li
   z-index: 3;
 }
 
-.overlay {
-  background-color: rgb(0 0 0 / 50%) !important;
-  display: none;
+ul li.nav-drop > ul > li > ul {
+  margin: 1em 0 0 .5em;
+}
+
+main.overlay {
+  width: 100%;
+  height: 100%;
   inset: 0;
-  position: fixed;
+  background-color: rgb(0 0 0 / 50%);
   z-index: 2;
 }
 
-.overlay.show {
-  display: block;
+header nav .nav-sections .active-submenu {
+  display: none;
 }
 
 @media (width < 900px) {
@@ -565,26 +594,12 @@ li
     position: relative;
   }
 
-  header .nav-wrapper.active,
-  header .nav-wrapper:has( nav[aria-expanded='true']) {
-    width: 320px;
-  }
-
-  header .nav-wrapper.active nav .nav-hamburger button,
-  header .nav-wrapper:has( nav[aria-expanded='true']) nav .nav-hamburger button {
-    position: fixed;
-    left: 275px;
-    z-index: 5;
-  }
-
   header nav {
     position: relative;
   }
 
   header nav[aria-expanded='true'] {
-    gap: var(--spacing-small);
     overflow-x: hidden;
-    width: 320px;
   }
 
   header nav[aria-expanded='true'] .nav-tools {
@@ -593,9 +608,9 @@ li
     height: auto;
     left: 0;
     overflow: hidden;
-    padding: var(--spacing-small) var(--spacing-medium);
+    padding: 0.7em 1.5em;
     position: fixed;
-    width: 272px;
+    width: 100%;
   }
 
   header nav[aria-expanded='true'] .nav-tools-panel--show {
@@ -606,118 +621,67 @@ li
     position: relative;
   }
 
-  header nav .nav-sections ul {
-    margin: 0;
-  }
-
   header nav .nav-sections ul li {
-    font: var(--type-headline-2-default-font);
-    letter-spacing: var(--type-headline-2-default-letter-spacing);
-    padding: var(--spacing-small) 0;
+    line-height: 3em;
   }
 
-  header nav .nav-sections ul li a {
-    font: var(--type-headline-2-default-font);
-    letter-spacing: var(--type-headline-2-default-letter-spacing);
-  }
-
-  header nav .nav-sections ul > li ul {
+  header nav .nav-sections ul > li > ul,
+  header nav .nav-sections ul > li > ul > li {
     width: 100%;
-  }
-
-  header nav .nav-sections ul > li ul > li {
-    font: var(--type-headline-2-default-font);
-    letter-spacing: var(--type-headline-2-default-letter-spacing);
-    padding: var(--spacing-xsmall);
-    width: auto;
-  }
-
-  header nav .nav-sections ul > li ul > li a {
-    font: var(--type-headline-2-default-font);
-    letter-spacing: var(--type-headline-2-default-letter-spacing);
-  }
-
-  header nav .nav-sections ul > li ul > li:has(img) {
-    margin: var(--spacing-small) 0;
-    padding: 0;
-  }
-
-  header nav[aria-expanded='true'] .nav-brand {
-    display: none;
   }
 
   header nav .nav-sections ul > li.nav-drop {
     cursor: pointer;
   }
 
-  header nav .nav-sections ul > li.nav-drop::before {
+  header nav .nav-sections ul > li.nav-drop::after {
     content: '\276F';
     position: absolute;
-    right: var(--spacing-xxsmall);
+    right: 3vw;
   }
 
   header nav .nav-sections ul > li.nav-drop ul {
     display: none;
-    outline: none;
   }
 
-  header nav .nav-sections ul > li.nav-drop .submenu-wrapper {
-    display: none;
-  }
-
-  header nav .nav-sections ul > li.nav-drop.active .submenu-wrapper {
+  header nav .nav-sections .active-submenu {
     background: var(--background-color);
-    display: block;
+    display: none;
     height: 100%;
-    left: 0;
     position: absolute;
-    top: 0;
+    top: 30px;
     width: 100%;
-    z-index: 3;
   }
 
-  header nav .nav-sections ul > li.nav-drop.active ul {
-    display: block;
-    padding-bottom: var(--spacing-large);
-  }
-
-  header nav .nav-sections ul > li.nav-drop .submenu-header {
-    background: var(--background-color);
-    height: var(--spacing-large);
-    left: 0;
-    position: fixed;
-    top: 0;
-    width: 320px;
-    z-index: 3;
-  }
-
-  header nav .nav-sections ul > li.nav-drop .submenu-header .back-link {
-    font: var(--type-body-1-strong-font);
-    height: 2.2em;
-    letter-spacing: var(--type-body-1-strong-letter-spacing);
-    line-height: 2.2em;
-    padding: 0 var(--spacing-medium);
-  }
-
-  header nav .nav-sections ul > li.nav-drop .submenu-header hr {
-    margin: 0;
-    position: absolute;
-    top: var(--spacing-large);
-    width: 320px;
-  }
-
-  header nav .nav-sections ul > li .submenu-header .back-link::before {
+  header nav .nav-sections .active-submenu button::before {
     content: '\276E';
-    margin-right: var(--spacing-xsmall);
+    margin-right: .5em;
   }
 
-  header nav .nav-sections ul > li.nav-drop .submenu-title {
-    font: var(--type-body-1-default-font);
-    letter-spacing: var(--type-body-1-default-letter-spacing);
-    margin-bottom: var(--spacing-small);
+  header nav .nav-sections .active-submenu button::after {
+    content: '\2715';
+    position: absolute;
+    right: 8vw;
   }
 
-  header nav .nav-sections ul li:empty {
-    display: none;
+  header nav .nav-sections .active-submenu button {
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--color-neutral-500);
+    cursor: pointer;
+    left: -2em;
+    padding: 0 2em 1em;
+    position: relative;
+    text-align: left;
+    width: 102vw;
+  }
+
+  header nav .nav-sections .active-submenu ul > li.nav-drop::after {
+    content: none;
+  }
+
+  header nav .nav-sections .active-submenu.visible,
+  header nav .nav-sections .active-submenu.visible ul > li.nav-drop ul {
+    display: block;
   }
 }

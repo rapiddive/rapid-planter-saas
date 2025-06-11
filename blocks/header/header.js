@@ -1,24 +1,22 @@
 /* eslint-disable import/no-unresolved */
-
-// Drop-in Tools
-import { events } from '@dropins/tools/event-bus.js';
-
-// Cart dropin
-import { publishShoppingCartViewEvent } from '@dropins/storefront-cart/api.js';
-
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
 import renderAuthCombine from './renderAuthCombine.js';
 import { renderAuthDropdown } from './renderAuthDropdown.js';
-import { rootLink } from '../../scripts/scripts.js';
+
+import { renderPlpDropin } from '../product-list-page/product-list-page.js';
+import initSearchPopover from './searchbar.js';
+import { getConfigValue } from '../../scripts/configs.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
 
-const overlay = document.createElement('div');
-overlay.classList.add('overlay');
-document.querySelector('header').insertAdjacentElement('afterbegin', overlay);
+const brandIds = {
+  Aurora: { id: 'b726c1e9-2842-4ab5-9b19-ca65c23bbb3b', value: 'Aurora', models: ['Flux', 'Nexus', 'Nova', 'Prism', 'Pulse'] },
+  Bolt: { id: '552fb8e1-978f-42c5-aab2-d96642e436d8', value: 'Bolt', models: ['Atlas', 'Mammoth', 'Ranger', 'Scout', 'Terrain'] },
+  Cruz: { id: '7140c0dc-0abf-4817-91ad-22f4edceeb85', value: 'Cruz', models: ['Breeze', 'Echo', 'Element', 'Harmony', 'Verde'] },
+};
 
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
@@ -28,15 +26,12 @@ function closeOnEscape(e) {
     if (navSectionExpanded && isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleAllNavSections(navSections);
-      overlay.classList.remove('show');
+      document.getElementsByTagName('main')[0].classList.remove('overlay');
       navSectionExpanded.focus();
     } else if (!isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleMenu(nav, navSections);
-      overlay.classList.remove('show');
       nav.querySelector('button').focus();
-      const navWrapper = document.querySelector('.nav-wrapper');
-      navWrapper.classList.remove('active');
     }
   }
 }
@@ -49,7 +44,7 @@ function closeOnFocusLost(e) {
     if (navSectionExpanded && isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleAllNavSections(navSections, false);
-      overlay.classList.remove('show');
+      document.getElementsByTagName('main')[0].classList.remove('overlay');
     } else if (!isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleMenu(nav, navSections, true);
@@ -109,7 +104,6 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
     });
   } else {
     navDrops.forEach((drop) => {
-      drop.classList.remove('active');
       drop.removeAttribute('tabindex');
       drop.removeEventListener('focus', focusNavSection);
     });
@@ -127,35 +121,79 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   }
 }
 
-const subMenuHeader = document.createElement('div');
-subMenuHeader.classList.add('submenu-header');
-subMenuHeader.innerHTML = '<h5 class="back-link">All Categories</h5><hr />';
+const activeSubmenu = document.createElement('div');
+activeSubmenu.classList.add('active-submenu');
+activeSubmenu.innerHTML = `
+    <button>All Categories</button>
+    <h6>Title</h6><ul><li class="nav-drop"></li></ul>
+`;
 
 /**
- * Sets up the submenu
+ * Sets up the menu for mobile
  * @param {navSection} navSection The nav section element
  */
-function setupSubmenu(navSection) {
-  if (navSection.querySelector('ul')) {
+function setupMobileMenu(navSection) {
+  if (!isDesktop.matches && navSection.querySelector('ul')) {
     let label;
     if (navSection.childNodes.length) {
       [label] = navSection.childNodes;
     }
 
-    const submenu = navSection.querySelector('ul');
-    const wrapper = document.createElement('div');
-    const header = subMenuHeader.cloneNode(true);
-    const title = document.createElement('h6');
-    title.classList.add('submenu-title');
-    title.textContent = label.textContent;
+    const subMenu = navSection.querySelector('ul');
+    const clonedSubMenu = subMenu.cloneNode(true);
 
-    wrapper.classList.add('submenu-wrapper');
-    wrapper.appendChild(header);
-    wrapper.appendChild(title);
-    wrapper.appendChild(submenu.cloneNode(true));
+    navSection.addEventListener('click', () => {
+      activeSubmenu.classList.add('visible');
+      activeSubmenu.querySelector('h6').textContent = label.textContent;
+      activeSubmenu.querySelector('li')
+        .append(clonedSubMenu);
+    });
+  }
+}
 
-    navSection.appendChild(wrapper);
-    navSection.removeChild(submenu);
+/**
+ * Creates a button to clear selections
+ * @returns {Element} The clear selections button
+ */
+function createClearedSelectionsButton() {
+  const closeBtnDiv = document.createElement('li');
+  const closeBtn = document.createElement('p');
+  closeBtn.addClassName = 'nav-close-btn';
+  closeBtn.textContent = 'Clear Selections';
+  closeBtnDiv.id = 'clear-selections';
+  closeBtnDiv.style.display = window.localStorage.getItem('selectedBrand') ? 'block' : 'none';
+  closeBtnDiv.appendChild(closeBtn);
+  closeBtn.addEventListener('click', () => {
+    const brandSelect = document.getElementById('select-brand').querySelector('p');
+    const modelSelect = document.getElementById('select-model').querySelector('p');
+    const modelList = document.getElementById('select-model').querySelector('ul');
+    brandSelect.textContent = 'Brand';
+    modelSelect.textContent = 'Model';
+    modelList.innerHTML = '';
+    closeBtnDiv.style.display = 'none';
+    window.localStorage.removeItem('selectedBrand');
+    window.localStorage.removeItem('selectedModel');
+    renderPlpDropin({});
+  });
+  return closeBtnDiv;
+}
+
+// Display clear selections button
+function showClearSelectionsButton() {
+  const closeBtn = document.getElementById('clear-selections');
+  closeBtn.style.display = 'block';
+}
+
+// Set selected model
+function setSelectedModel(modelName) {
+  if (modelName) {
+    const selectedModel = modelName;
+    document.getElementById('select-model').querySelector('p').textContent = `Model: ${selectedModel}`;
+    window.localStorage.setItem('selectedModel', selectedModel);
+    showClearSelectionsButton();
+  } else {
+    document.getElementById('select-model').querySelector('p').textContent = 'Model';
+    window.localStorage.removeItem('selectedModel');
   }
 }
 
@@ -189,87 +227,135 @@ export default async function decorate(block) {
   }
 
   const navSections = nav.querySelector('.nav-sections');
+
+  // Add clear selections button
+  const clearSelectionsBtn = createClearedSelectionsButton();
+  navSections.querySelector('.default-content-wrapper > ul').appendChild(clearSelectionsBtn);
+
+  const dealershipName = await getConfigValue('dealer-name');
+
   if (navSections) {
+    // set selected values to local storage value or empty
+    const localStorageBrand = window.localStorage.getItem('selectedBrand');
+    const localStorageModel = window.localStorage.getItem('selectedModel');
+    const selectedBrand = brandIds[localStorageBrand] || '';
+    const selectedModel = (selectedBrand && localStorageModel && selectedBrand.models.includes(localStorageModel)) ? localStorageModel : '';
+
     navSections
       .querySelectorAll(':scope .default-content-wrapper > ul > li')
       .forEach((navSection) => {
-        if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
-        setupSubmenu(navSection);
-        navSection.addEventListener('click', (event) => {
-          if (event.target.tagName === 'A') return;
-          if (!isDesktop.matches) {
-            navSection.classList.toggle('active');
+        const dropdownText = navSection.querySelector('p').textContent.split(':')[0];
+        const dropdownId = dropdownText.toLowerCase().replace(' ', '-');
+
+        if (navSection.querySelector('ul')) {
+          navSection.id = `select-${dropdownId}`;
+          navSection.classList.add('nav-drop');
+        }
+
+        if (selectedBrand && navSection.id === 'select-brand') {
+          navSection.querySelector('p').textContent = `Brand: ${selectedBrand.value}`;
+          window.localStorage.setItem('selectedBrand', selectedBrand.value);
+        }
+
+        navBrand.querySelector('a').title = dealershipName;
+        navBrand.querySelector('a').textContent = dealershipName;
+
+        // on select model clicks
+        if (navSection.id === 'select-model') {
+          const modelList = navSection.querySelector('ul');
+          modelList.innerHTML = '';
+        }
+        if (selectedBrand && navSection.id === 'select-model') {
+          const modelList = navSection.querySelector('ul');
+          modelList.innerHTML = '';
+
+          selectedBrand.models.forEach((model) => {
+            const li = document.createElement('li');
+            li.textContent = model;
+            modelList.appendChild(li);
+          });
+        }
+
+        if (selectedModel && navSection.id === 'select-model') {
+          if (selectedBrand.models.includes(selectedModel)) {
+            // Dropdown doesn't exist on document so cant use setModel function
+            navSection.querySelector('p').textContent = `Model: ${selectedModel}`;
+            window.localStorage.setItem('selectedModel', selectedModel);
           }
-        });
-        navSection.addEventListener('mouseenter', () => {
-          toggleAllNavSections(navSections);
+        }
+
+        if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
+        setupMobileMenu(navSection);
+        navSection.addEventListener('click', () => {
           if (isDesktop.matches) {
-            if (!navSection.classList.contains('nav-drop')) {
-              overlay.classList.remove('show');
-              return;
-            }
-            navSection.setAttribute('aria-expanded', 'true');
-            overlay.classList.add('show');
+            const expanded = navSection.getAttribute('aria-expanded') === 'true';
+            toggleAllNavSections(navSections);
+            navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
           }
         });
       });
+
+    // FOR CCDM DEMO ONLY
+
+    const dropdownItems = navSections.querySelectorAll(':scope .default-content-wrapper > ul > li > ul > li');
+    const dropDownClickHandler = (navItem) => () => {
+      const navSection = navItem.parentNode.parentNode.querySelector('p');
+      const selectedItem = navItem.textContent;
+      const currentModel = document.getElementById('select-model').querySelector('p').innerText.split(':')[1]?.trim();
+
+      if (navSection.textContent.includes('Brand') && brandIds[selectedItem]) {
+        navSection.innerText = `Brand: ${selectedItem}`;
+        window.localStorage.setItem('selectedBrand', selectedItem);
+        showClearSelectionsButton();
+
+        const { models } = brandIds[selectedItem];
+
+        const modelList = document.getElementById('select-model').querySelector('ul');
+        modelList.innerHTML = '';
+        models.forEach((model) => {
+          const li = document.createElement('li');
+          li.textContent = model;
+          const modelNode = modelList.appendChild(li);
+          modelNode.addEventListener('click', dropDownClickHandler(modelNode));
+        });
+
+        if (!models.includes(currentModel)) {
+          setSelectedModel();
+        }
+      }
+
+      if (navSection.textContent.includes('Model')) {
+        setSelectedModel(selectedItem);
+      }
+
+      // render PLP dropin with selected model in policy header
+      const ddBrand = document.getElementById('select-brand').querySelector('p').innerText.split(':')[1]?.trim();
+      const ddModel = document.getElementById('select-model').querySelector('p').innerText.split(':')[1]?.trim();
+      renderPlpDropin({
+        ...(ddBrand ? { 'AC-Policy-Brand': ddBrand } : {}),
+        ...(ddModel ? { 'AC-Policy-Model': ddModel } : {}),
+      });
+    };
+
+    dropdownItems
+      // listen for individual clicks
+      .forEach((navItem) => {
+        navItem.addEventListener('click', dropDownClickHandler(navItem));
+      });
   }
 
+  if (!isDesktop.matches) {
+    activeSubmenu.querySelector('button').addEventListener('click', () => {
+      activeSubmenu.classList.remove('visible');
+      activeSubmenu.querySelector('.nav-drop').removeChild(activeSubmenu.querySelector('.nav-drop ul'));
+    });
+
+    navSections.append(activeSubmenu);
+  }
   const navTools = nav.querySelector('.nav-tools');
 
-  /** Mini Cart */
-  const excludeMiniCartFromPaths = ['/checkout'];
-
-  const minicart = document.createRange().createContextualFragment(`
-     <div class="minicart-wrapper nav-tools-wrapper">
-       <button type="button" class="nav-cart-button" aria-label="Cart"></button>
-       <div class="minicart-panel nav-tools-panel"></div>
-     </div>
-   `);
-
-  navTools.append(minicart);
-
-  const minicartPanel = navTools.querySelector('.minicart-panel');
-
-  const cartButton = navTools.querySelector('.nav-cart-button');
-
-  if (excludeMiniCartFromPaths.includes(window.location.pathname)) {
-    cartButton.style.display = 'none';
-  }
-
-  // load nav as fragment
-  const miniCartMeta = getMetadata('mini-cart');
-  const miniCartPath = miniCartMeta ? new URL(miniCartMeta, window.location).pathname : '/mini-cart';
-  loadFragment(miniCartPath).then((miniCartFragment) => {
-    minicartPanel.append(miniCartFragment.firstElementChild);
-  });
-
-  async function toggleMiniCart(state) {
-    const show = state ?? !minicartPanel.classList.contains('nav-tools-panel--show');
-    const stateChanged = show !== minicartPanel.classList.contains('nav-tools-panel--show');
-    minicartPanel.classList.toggle('nav-tools-panel--show', show);
-
-    if (stateChanged && show) {
-      publishShoppingCartViewEvent();
-    }
-  }
-
-  cartButton.addEventListener('click', () => toggleMiniCart());
-
-  // Cart Item Counter
-  events.on(
-    'cart/data',
-    (data) => {
-      if (data?.totalQuantity) {
-        cartButton.setAttribute('data-count', data.totalQuantity);
-      } else {
-        cartButton.removeAttribute('data-count');
-      }
-    },
-    { eager: true },
-  );
-
   /** Search */
+
   // TODO
   const search = document.createRange().createContextualFragment(`
   <div class="search-wrapper nav-tools-wrapper">
@@ -291,56 +377,30 @@ export default async function decorate(block) {
 
   const searchInput = searchPanel.querySelector('input');
 
-  const searchForm = searchPanel.querySelector('form');
-
-  searchForm.action = rootLink('/search');
-
   async function toggleSearch(state) {
     const show = state ?? !searchPanel.classList.contains('nav-tools-panel--show');
 
     searchPanel.classList.toggle('nav-tools-panel--show', show);
 
     if (show) {
-      await import('./searchbar.js');
+      const selectedBrand = document.getElementById('select-brand').querySelector('p').innerText.split(':')[1]?.trim();
+      const selectedModel = document.getElementById('select-model').querySelector('p').innerText.split(':')[1]?.trim();
+      const selectedHeaders = {
+        ...(selectedBrand ? { 'AC-Policy-Brand': selectedBrand } : {}),
+        ...(selectedModel ? { 'AC-Policy-Model': selectedModel } : {}),
+      };
+      initSearchPopover(selectedHeaders);
       searchInput.focus();
     }
   }
 
-  navTools.querySelector('.nav-search-button').addEventListener('click', () => {
-    if (isDesktop.matches) {
-      toggleAllNavSections(navSections);
-      overlay.classList.remove('show');
-    }
-    toggleSearch();
-  });
+  navTools.querySelector('.nav-search-button').addEventListener('click', () => toggleSearch());
 
   // Close panels when clicking outside
   document.addEventListener('click', (e) => {
-    if (!minicartPanel.contains(e.target) && !cartButton.contains(e.target)) {
-      toggleMiniCart(false);
-    }
-
     if (!searchPanel.contains(e.target) && !searchButton.contains(e.target)) {
       toggleSearch(false);
     }
-  });
-
-  const navWrapper = document.createElement('div');
-  navWrapper.className = 'nav-wrapper';
-  navWrapper.append(nav);
-  block.append(navWrapper);
-
-  navWrapper.addEventListener('mouseout', (e) => {
-    if (isDesktop.matches && !nav.contains(e.relatedTarget)) {
-      toggleAllNavSections(navSections);
-      overlay.classList.remove('show');
-    }
-  });
-
-  window.addEventListener('resize', () => {
-    navWrapper.classList.remove('active');
-    overlay.classList.remove('show');
-    toggleMenu(nav, navSections, false);
   });
 
   // hamburger for mobile
@@ -349,16 +409,18 @@ export default async function decorate(block) {
   hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
       <span class="nav-hamburger-icon"></span>
     </button>`;
-  hamburger.addEventListener('click', () => {
-    navWrapper.classList.toggle('active');
-    overlay.classList.toggle('show');
-    toggleMenu(nav, navSections);
-  });
+  hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
   nav.prepend(hamburger);
   nav.setAttribute('aria-expanded', 'false');
   // prevent mobile nav behavior on window resize
   toggleMenu(nav, navSections, isDesktop.matches);
   isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
+
+  const navWrapper = document.createElement('div');
+  navWrapper.className = 'nav-wrapper';
+  navWrapper.classList.add(dealershipName?.toLowerCase().replace(' ', '-'));
+  navWrapper.append(nav);
+  block.append(navWrapper);
 
   renderAuthCombine(
     navSections,

@@ -3,7 +3,7 @@ import { initializers } from '@dropins/tools/initializer.js';
 import { initialize, setFetchGraphQlHeaders } from '@dropins/storefront-order/api.js';
 import { checkIsAuthenticated, getHeaders } from '../configs.js';
 import { initializeDropin } from './index.js';
-import { fetchPlaceholders } from '../commerce.js';
+import { fetchPlaceholders } from '../aem.js';
 
 import {
   CUSTOMER_ORDER_DETAILS_PATH,
@@ -16,7 +16,6 @@ import {
   ORDER_STATUS_PATH,
   CUSTOMER_PATH, SALES_GUEST_VIEW_PATH, SALES_ORDER_VIEW_PATH,
 } from '../constants.js';
-import { rootLink } from '../scripts.js';
 
 await initializeDropin(async () => {
   const { pathname, searchParams } = new URL(window.location.href);
@@ -29,7 +28,7 @@ await initializeDropin(async () => {
   const orderNumber = searchParams.get('orderNumber');
   const isTokenProvided = orderRef && orderRef.length > 20;
 
-  setFetchGraphQlHeaders((prev) => ({ ...prev, ...getHeaders('order') }));
+  setFetchGraphQlHeaders(await getHeaders('order'));
 
   const labels = await fetchPlaceholders();
   const langDefinitions = {
@@ -82,11 +81,11 @@ async function handleUserOrdersRedirects(
 
   events.on('order/error', () => {
     if (checkIsAuthenticated()) {
-      window.location.href = rootLink(CUSTOMER_ORDERS_PATH);
+      window.location.href = CUSTOMER_ORDERS_PATH;
     } else if (isTokenProvided) {
-      window.location.href = orderNumber ? rootLink(`${ORDER_STATUS_PATH}?orderRef=${orderNumber}`) : rootLink(ORDER_STATUS_PATH);
+      window.location.href = orderNumber ? `${ORDER_STATUS_PATH}?orderRef=${orderNumber}` : ORDER_STATUS_PATH;
     } else {
-      window.location.href = rootLink(`${ORDER_STATUS_PATH}?orderRef=${orderRef}`);
+      window.location.href = `${ORDER_STATUS_PATH}?orderRef=${orderRef}`;
     }
   });
 
@@ -107,7 +106,7 @@ async function handleUserOrdersRedirects(
   }
 
   if (targetPath) {
-    window.location.href = rootLink(targetPath);
+    window.location.href = targetPath;
   } else {
     await initializers.mountImmediately(initialize, {
       langDefinitions,

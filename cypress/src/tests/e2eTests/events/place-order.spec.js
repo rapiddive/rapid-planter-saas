@@ -1,9 +1,8 @@
 import {
-  checkTermsAndConditions,
   placeOrder,
   setGuestEmail,
   setGuestShippingAddress,
-} from '../../../actions';
+} from "../../../actions";
 import { expectsEventWithContext } from "../../../assertions";
 import { customerShippingAddress, products } from "../../../fixtures";
 
@@ -47,10 +46,6 @@ it("is sent on place order button click", () => {
   // fill in the shipping address form
   setGuestShippingAddress(customerShippingAddress, true);
   cy.wait(2000);
-
-  // check terms and conditions
-  checkTermsAndConditions();
-
   // click the place order button
   placeOrder();
   // wait until the URL includes '/order-details'

@@ -1,9 +1,8 @@
 import { getSignInToken, performMonolithGraphQLQuery } from '../commerce.js';
 import { CUSTOMER_LOGIN_PATH } from '../constants.js';
-import { rootLink } from '../scripts.js';
 
 const redirectToSignin = () => {
-  window.location = rootLink(CUSTOMER_LOGIN_PATH);
+  window.location = CUSTOMER_LOGIN_PATH;
 };
 
 const getWishlistsQuery = `

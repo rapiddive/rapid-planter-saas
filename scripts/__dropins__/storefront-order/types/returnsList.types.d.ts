@@ -1,5 +1,4 @@
 import { SlotProps } from '@dropins/tools/types/elsie/src/src/lib';
-import { ImageProps } from '@dropins/tools/types/elsie/src/components';
 import { OrderDataModel, OrderItemModel, OrdersReturnItemsPropsModel, OrdersReturnPropsModel, PageInfoProps } from '../data/models';
 
 export interface IconConfig {
@@ -18,10 +17,6 @@ export interface ReturnsListProps {
         }>;
         DetailsActionParams?: SlotProps<{
             returnOrderItem: OrdersReturnPropsModel;
-        }>;
-        ReturnListImage?: SlotProps<{
-            data: OrdersReturnItemsPropsModel;
-            defaultImageProps: ImageProps;
         }>;
     };
     returnPageSize?: number;

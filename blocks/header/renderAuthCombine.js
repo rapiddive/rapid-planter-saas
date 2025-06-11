@@ -13,11 +13,10 @@ import {
   CUSTOMER_FORGOTPASSWORD_PATH,
   CUSTOMER_LOGIN_PATH,
 } from '../../scripts/constants.js';
-import { rootLink } from '../../scripts/scripts.js';
 
 const signInFormConfig = {
   renderSignUpLink: true,
-  routeForgotPassword: () => rootLink(CUSTOMER_FORGOTPASSWORD_PATH),
+  routeForgotPassword: () => CUSTOMER_FORGOTPASSWORD_PATH,
   slots: {
     SuccessNotification: (ctx) => {
       const userName = ctx?.isSuccessful?.userName || '';
@@ -37,7 +36,7 @@ const signInFormConfig = {
               children: 'My Account',
 
               onClick: () => {
-                window.location.href = rootLink(CUSTOMER_ACCOUNT_PATH);
+                window.location.href = CUSTOMER_ACCOUNT_PATH;
               },
             })(primaryBtn);
 
@@ -53,7 +52,7 @@ const signInFormConfig = {
               variant: 'tertiary',
               onClick: async () => {
                 await authApi.revokeCustomerToken();
-                window.location.href = rootLink('/');
+                window.location.href = '/';
               },
             })(secondaryButton);
 
@@ -68,8 +67,8 @@ const signInFormConfig = {
 };
 
 const signUpFormConfig = {
-  routeSignIn: () => rootLink(CUSTOMER_LOGIN_PATH),
-  routeRedirectOnSignIn: () => rootLink(CUSTOMER_ACCOUNT_PATH),
+  routeSignIn: () => CUSTOMER_LOGIN_PATH,
+  routeRedirectOnSignIn: () => CUSTOMER_ACCOUNT_PATH,
   isAutoSignInEnabled: false,
   slots: {
     SuccessNotification: (ctx) => {
@@ -88,7 +87,7 @@ const signUpFormConfig = {
               children: 'Sign in',
 
               onClick: () => {
-                window.location.href = rootLink(CUSTOMER_LOGIN_PATH);
+                window.location.href = CUSTOMER_LOGIN_PATH;
               },
             })(primaryBtn);
 
@@ -103,7 +102,7 @@ const signUpFormConfig = {
               children: 'Home',
               variant: 'tertiary',
               onClick: () => {
-                window.location.href = rootLink('/');
+                window.location.href = '/';
               },
             })(secondaryButton);
 
@@ -118,7 +117,7 @@ const signUpFormConfig = {
 };
 
 const resetPasswordFormConfig = {
-  routeSignIn: () => rootLink(CUSTOMER_LOGIN_PATH),
+  routeSignIn: () => CUSTOMER_LOGIN_PATH,
 };
 
 const onHeaderLinkClick = (element) => {
@@ -126,7 +125,7 @@ const onHeaderLinkClick = (element) => {
   const originalViewportContent = viewportMeta.getAttribute('content');
 
   if (getCookie('auth_dropin_firstname')) {
-    window.location.href = rootLink(CUSTOMER_ACCOUNT_PATH);
+    window.location.href = CUSTOMER_ACCOUNT_PATH;
     return;
   }
   const signInModal = document.createElement('div');
@@ -215,73 +214,69 @@ const renderAuthCombine = (navSections, toggleMenu) => {
   const listItems = navListEl.querySelectorAll(
     '.default-content-wrapper > ul > li',
   );
-
   const accountLi = Array.from(listItems).find((li) =>
     li.textContent.includes('Account'));
+  const accountLiItems = accountLi.querySelectorAll('ul > li');
+  const authCombineLink = accountLiItems[accountLiItems.length - 1];
 
-  if (accountLi) {
-    const accountLiItems = accountLi.querySelectorAll('ul > li');
-    const authCombineLink = accountLiItems[accountLiItems.length - 1];
+  authCombineLink.classList.add('authCombineNavElement');
+  const text = authCombineLink.textContent || '';
+  authCombineLink.innerHTML = `<a href="#">${text}</a>`;
+  authCombineLink.addEventListener('click', (event) => {
+    event.preventDefault();
+    onHeaderLinkClick(accountLi);
 
-    authCombineLink.classList.add('authCombineNavElement');
-    const text = authCombineLink.textContent || '';
-    authCombineLink.innerHTML = `<a href="#">${text}</a>`;
-    authCombineLink.addEventListener('click', (event) => {
-      event.preventDefault();
-      onHeaderLinkClick(accountLi);
+    function getPopupElements() {
+      const headerBlock = document.querySelector('.header.block');
+      const headerLoginButton = document.querySelector('#header-login-button');
+      const popupElement = document.querySelector('#popup-menu');
+      const popupMenuContainer = document.querySelector('.popupMenuContainer');
 
-      function getPopupElements() {
-        const headerBlock = document.querySelector('.header.block');
-        const headerLoginButton = document.querySelector('#header-login-button');
-        const popupElement = document.querySelector('#popup-menu');
-        const popupMenuContainer = document.querySelector('.popupMenuContainer');
+      return {
+        headerBlock,
+        headerLoginButton,
+        popupElement,
+        popupMenuContainer,
+      };
+    }
 
-        return {
-          headerBlock,
-          headerLoginButton,
-          popupElement,
-          popupMenuContainer,
-        };
-      }
+    events.on('authenticated', (isAuthenticated) => {
+      const authCombineNavElement = document.querySelector(
+        '.authCombineNavElement',
+      );
+      if (isAuthenticated) {
+        const { headerLoginButton, popupElement, popupMenuContainer } = getPopupElements();
 
-      events.on('authenticated', (isAuthenticated) => {
-        const authCombineNavElement = document.querySelector(
-          '.authCombineNavElement',
-        );
-        if (isAuthenticated) {
-          const { headerLoginButton, popupElement, popupMenuContainer } = getPopupElements();
-
-          if (
-            !authCombineNavElement
+        if (
+          !authCombineNavElement
           || !headerLoginButton
           || !popupElement
           || !popupMenuContainer
-          ) {
-            return;
-          }
+        ) {
+          return;
+        }
 
-          authCombineNavElement.style.display = 'none';
-          popupMenuContainer.innerHTML = '';
-          popupElement.style.minWidth = '250px';
-          if (headerLoginButton) {
-            const spanElementText = headerLoginButton.querySelector('span');
-            spanElementText.textContent = `Hi, ${getCookie(
-              'auth_dropin_firstname',
-            )}`;
-          }
-          popupMenuContainer.insertAdjacentHTML(
-            'afterend',
-            `<ul class="popupMenuUrlList">
-              <li><a href="${rootLink(CUSTOMER_ACCOUNT_PATH)}">My Account</a></li>
-              <li><a href="${rootLink('/products/hollister-backyard-sweatshirt/MH05')}">Product page</a></li>
+        authCombineNavElement.style.display = 'none';
+        popupMenuContainer.innerHTML = '';
+        popupElement.style.minWidth = '250px';
+        if (headerLoginButton) {
+          const spanElementText = headerLoginButton.querySelector('span');
+          spanElementText.textContent = `Hi, ${getCookie(
+            'auth_dropin_firstname',
+          )}`;
+        }
+        popupMenuContainer.insertAdjacentHTML(
+          'afterend',
+          `<ul class="popupMenuUrlList">
+              <li><a href={CUSTOMER_ACCOUNT_PATH}>My Account</a></li>
+              <li><a href="/products/hollister-backyard-sweatshirt/MH05">Product page</a></li>
               <li><button class="logoutButton">Logout</button></li>
             </ul>`,
-          );
-        }
-      });
-      toggleMenu?.();
+        );
+      }
     });
-  }
+    toggleMenu?.();
+  });
 };
 
 export default renderAuthCombine;

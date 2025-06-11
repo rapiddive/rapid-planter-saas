@@ -3,7 +3,6 @@
 import { render as orderRenderer } from '@dropins/storefront-order/render.js';
 import { ShippingStatus } from '@dropins/storefront-order/containers/ShippingStatus.js';
 import { UPS_TRACKING_URL } from '../../scripts/constants.js';
-import { rootLink } from '../../scripts/scripts.js';
 
 // Initialize
 import '../../scripts/initializers/order.js';
@@ -18,10 +17,10 @@ export default async function decorate(block) {
     },
     routeProductDetails: (data) => {
       if (data?.orderItem) {
-        return rootLink(`/products/${data?.orderItem?.productUrlKey}/${data?.orderItem?.product?.sku}`);
+        return `/products/${data?.orderItem?.productUrlKey}/${data?.orderItem?.product?.sku}`;
       }
       if (data?.product) {
-        return rootLink(`/products/${data?.product?.urlKey}/${data?.product?.sku}`);
+        return `/products/${data?.product?.urlKey}/${data?.product?.sku}`;
       }
       return '#';
     },

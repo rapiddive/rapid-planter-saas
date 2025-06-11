@@ -19,7 +19,6 @@ export * from './errors';
 export * from './estimateShippingMethods';
 export * from './fetch-graphql';
 export * from './getCart';
-export * from './getCheckoutAgreements';
 export * from './getCustomer';
 export * from './getStoreConfig';
 export * from './initialize';

@@ -16,7 +16,6 @@
  *******************************************************************/
 export * from './transform-address';
 export * from './transform-cart';
-export * from './transform-checkout-agreements';
 export * from './transform-customer';
 export * from './transform-email-availability';
 export * from './transform-shipping-estimate';

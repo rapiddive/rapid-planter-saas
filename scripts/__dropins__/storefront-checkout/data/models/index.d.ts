@@ -17,7 +17,6 @@
 export * from './address';
 export * from './api';
 export * from './cart';
-export * from './checkout';
 export * from './country';
 export * from './custom-attribute';
 export * from './customer';
