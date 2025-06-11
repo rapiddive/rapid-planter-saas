@@ -1,26 +1,34 @@
 {
   "public": {
     "default": {
-      "commerce-core-endpoint": "https://www.aemshop.net/graphql",
+      "commerce-core-endpoint": "https://aemshop.net/graphql",
       "commerce-endpoint": "https://na1-sandbox.api.commerce.adobe.com/Fwus6kdpvYCmeEdcCX7PZg/graphql",
       "headers": {
+        "all": {
+          "Store": "default"
+        },
         "cs": {
-          "Magento-Customer-Group": "b6589fc6ab0dc82cf12099d1c2d40ab994e8410c",
+          "ac-channel-id": "9ced53d7-35a6-40c5-830e-8288c00985ad",
           "ac-environment-id": "Fwus6kdpvYCmeEdcCX7PZg",
-          "ac-scope-locale": "en-US",
-          "ac-price-book-id": "west_coast_inc"
+          "ac-price-book-id": "west_coast_inc",
+          "ac-scope-locale": "en-US"
         }
       },
       "analytics": {
         "base-currency-code": "USD",
         "environment": "Production",
         "store-id": 1,
-        "store-name": "ACO Demo",
-        "store-url": "https://www.aemshop.net",
+        "store-name": "ACO Store",
+        "store-url": "https://main--boilerplate-aco--adobe-commerce.aem.live",
         "store-view-id": 1,
         "store-view-name": "Default Store View",
         "website-id": 1,
         "website-name": "Main Website"
+      },
+      "plugins": {
+        "picker": {
+          "rootCategory": "2"
+        }
       }
     }
   }
