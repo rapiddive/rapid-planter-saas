@@ -1,5 +1,8 @@
 mountpoints:
-  /: https://adobe.sharepoint.com/:f:/r/sites/vinshah/Shared%20Documents/rapid-planter-saas
+  /:
+    url: https://content.da.live/rapiddive/rapid-planter-saas/
+    type: markup
+# /: https://adobe.sharepoint.com/:f:/r/sites/vinshah/Shared%20Documents/rapid-planter-saas
 
 folders:
   /products/: /products/default
