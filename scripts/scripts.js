@@ -23,7 +23,7 @@ import {
 } from './aem.js';
 import { trackHistory } from './commerce.js';
 import initializeDropins from './initializers/index.js';
-import summitOverrides from './summitOverrides.js';
+import { initializeConfig, getRootPath, getListOfRootPaths } from './configs.js';
 
 const AUDIENCES = {
   mobile: () => window.innerWidth < 600,
@@ -140,17 +140,66 @@ async function applyTemplates(doc) {
 }
 
 /**
+ * Notifies dropins about the current loading state.
+ * @param {string} state The loading state to notify
+ */
+function notifyUI(event) {
+  // skip if the event was already sent
+  if (events.lastPayload(`aem/${event}`) === event) return;
+  // notify dropins about the current loading state
+  const handleEmit = () => events.emit(`aem/${event}`);
+  // listen for prerender event
+  document.addEventListener('prerenderingchange', handleEmit, { once: true });
+  // emit the event immediately
+  handleEmit();
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
-  // hopefully forward compatible button decoration
+  decorateLinks(main);
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
+}
+
+/**
+ * Decorates all links in scope of element
+ *
+ * @param {HTMLElement} main
+ */
+function decorateLinks(main) {
+  const root = getRootPath();
+  const roots = getListOfRootPaths();
+
+  main.querySelectorAll('a').forEach((a) => {
+    // If we are in the root, do nothing
+    if (roots.length === 0) return;
+
+    try {
+      const url = new URL(a.href);
+      const {
+        origin,
+        pathname,
+        search,
+        hash,
+      } = url;
+
+      // if the links belongs to another store, do nothing
+      if (roots.some((r) => r !== root && pathname.startsWith(r))) return;
+
+      // If the link is already localized, do nothing
+      if (origin !== window.location.origin || pathname.startsWith(root)) return;
+      a.href = new URL(`${origin}${root}${pathname.replace(/^\//, '')}${search}${hash}`);
+    } catch {
+      console.warn('Could not make localized link');
+    }
+  });
 }
 
 function preloadFile(href, as) {
@@ -251,15 +300,13 @@ async function loadEager(doc) {
     // Template Decorations
     await applyTemplates(doc);
 
-    // Summit Overrides
-    main.replaceWith(await summitOverrides(main));
-
     // Load LCP blocks
     await loadSection(main.querySelector('.section'), waitForFirstImage);
     document.body.classList.add('appear');
   }
 
-  events.emit('eds/lcp', true);
+  // notify that the page is ready for eager loading
+  notifyUI('lcp');
 
   try {
     /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
@@ -361,6 +408,19 @@ export async function fetchIndex(indexFile, pageSize = 500) {
 }
 
 /**
+ * Decorates links.
+ * @param {string} [link] url to be localized
+ * @returns {string} - The localized link
+ */
+export function rootLink(link) {
+  const root = getRootPath().replace(/\/$/, '');
+
+  // If the link is already localized, do nothing
+  if (link.startsWith(root)) return link;
+  return `${root}${link}`;
+}
+
+/**
  * Check if consent was given for a specific topic.
  * @param {*} topic Topic identifier
  * @returns {boolean} True if consent was given
@@ -372,6 +432,7 @@ export function getConsent(topic) {
 }
 
 async function loadPage() {
+  await initializeConfig();
   await loadEager(document);
   await loadLazy(document);
   loadDelayed();

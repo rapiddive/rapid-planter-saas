@@ -1,22 +1,19 @@
-/* eslint-disable import/no-unresolved */
-import { render as provider } from '@dropins/storefront-search/render.js';
-import SearchPopover from '@dropins/storefront-search/containers/SearchPopover.js';
-import {
-  setFetchGraphQlHeaders,
-} from '@dropins/storefront-search/api.js';
+import { loadScript } from '../../scripts/aem.js';
+import { rootLink } from '../../scripts/scripts.js';
+import { getConfigValue } from '../../scripts/configs.js';
 
-import { getConfigValue, getHeaders } from '../../scripts/configs.js';
+(async () => {
+  const widgetProd = '/scripts/widgets/SearchAsYouType.js';
+  await loadScript(widgetProd);
 
-async function getStoreDetails() {
-  const [
-    apiUrl,
-    customerGroup,
-  ] = await Promise.all([
-    getConfigValue('commerce-endpoint'),
-    getConfigValue('commerce-customer-group'),
-  ]);
-  return {
-    apiUrl,
+  const storeDetails = {
+    environmentId: getConfigValue('headers.cs.Magento-Environment-Id'),
+    environmentType: (getConfigValue('commerce-endpoint')).includes('sandbox') ? 'testing' : '',
+    apiKey: getConfigValue('headers.cs.x-api-key'),
+    apiUrl: getConfigValue('commerce-endpoint'),
+    websiteCode: getConfigValue('headers.cs.Magento-Website-Code'),
+    storeCode: getConfigValue('headers.cs.Magento-Store-Code'),
+    storeViewCode: getConfigValue('headers.cs.Magento-Store-View-Code'),
     config: {
       pageSize: 8,
       perPageConfig: {
@@ -30,32 +27,24 @@ async function getStoreDetails() {
       allowAllProducts: false,
     },
     context: {
-      customerGroup,
+      customerGroup: getConfigValue('headers.cs.Magento-Customer-Group'),
     },
-    route: ({ sku, urlKey }) => `/products/${urlKey}/${sku}`,
+    route: ({ sku, urlKey }) => rootLink(`/products/${urlKey}/${sku}`),
     searchRoute: {
-      route: '/search',
+      route: rootLink('/search'),
       query: 'q',
     },
   };
-}
 
-export default async function initSearchPopover(headers) {
-  import('../../scripts/initializers/search.js');
-  try {
-    const storeDetails = await getStoreDetails();
-    const apiHeaders = await getHeaders('cs');
-    setFetchGraphQlHeaders({ ...apiHeaders, ...headers });
-    const rootElement = document.getElementById('search_autocomplete');
+  await new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (window.LiveSearchAutocomplete) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 200);
+  });
 
-    if (rootElement) {
-      provider.render(SearchPopover, { storefrontDetails: storeDetails })(
-        rootElement,
-      );
-    } else {
-      console.error('Root element #search_autocomplete not found.');
-    }
-  } catch (error) {
-    console.error('Failed to initialize search popover:', error);
-  }
-}
+  // eslint-disable-next-line no-new
+  new window.LiveSearchAutocomplete(storeDetails);
+})();

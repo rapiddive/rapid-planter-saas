@@ -117,7 +117,3 @@
     grid-column: 1 / span 2;
   }
 }
-
-.product-details__quantity {
-    display: none;
-}
