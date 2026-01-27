@@ -1,12 +1,20 @@
-/*! Copyright 2025 Adobe
+/*! Copyright 2026 Adobe
 All Rights Reserved. */
-import{s as r}from"./state.js";import{g as e}from"./transform-store-config.js";import{c as s,M as l}from"./errors.js";import{j as o,d as m,b as n}from"./synchronizeCheckout.js";import"@dropins/tools/lib.js";import"@dropins/tools/event-bus.js";import{CHECKOUT_DATA_FRAGMENT as c}from"../fragments.js";const u=a=>!!(a!=null&&a.is_email_available),p=a=>{if(!(!a||a.length===0))throw Error(a.map(t=>t.message).join(" "))},E=`
+import{CUSTOMER_FRAGMENT as o,CHECKOUT_DATA_FRAGMENT as n}from"../fragments.js";import{s as m,d as r,u as l,p as u,Q as c}from"./fetch-graphql.js";import{merge as E}from"@dropins/tools/lib.js";import"@dropins/tools/event-bus.js";import{c as p,t as f}from"./synchronizeCheckout.js";const C=t=>{var i,a,s;if(!t)return null;const e={firstName:t.firstname||"",lastName:t.lastname||"",email:t.email||""};return E(e,(s=(a=(i=p.getConfig().models)==null?void 0:i.CustomerModel)==null?void 0:a.transformer)==null?void 0:s.call(a,t))},y=t=>!!(t!=null&&t.is_email_available),A=`
+  query getCustomer {
+    customer {
+      ...CUSTOMER_FRAGMENT
+    }
+  }
+
+  ${o}
+`,M=async()=>m.authenticated?await r({options:{method:"GET",cache:"no-cache"},path:"customer",query:A,transformer:C,type:"query"}):null,g=`
   query isEmailAvailable($email: String!) {
     isEmailAvailable(email: $email) {
       is_email_available
     }
   }
-`,G=async a=>{if(!a)throw new s;const{data:t,errors:i}=await e(E,{method:"GET",cache:"no-cache",variables:{email:a}}).catch(o);return i&&p(i),u(t.isEmailAvailable)},h=`
+`,q=async t=>{if(!t)throw new l;return await r({options:{method:"GET",cache:"no-cache",variables:{email:t}},path:"isEmailAvailable",query:g,transformer:y,type:"query"})},h=`
   mutation setGuestEmail($cartId: String!, $email: String!) {
     setGuestEmailOnCart(input: { cart_id: $cartId, email: $email }) {
       cart {
@@ -15,5 +23,6 @@ import{s as r}from"./state.js";import{g as e}from"./transform-store-config.js";i
     }
   }
 
-  ${c}
-`,_=async a=>{const t=r.cartId;if(!t)throw new l;return await m({options:{variables:{cartId:t,email:a}},path:"setGuestEmailOnCart.cart",query:h,queueName:"cartUpdate",signalType:"cart",transformer:n,type:"mutation"})};export{p as h,G as i,_ as s};
+  ${n}
+`,N=async t=>{const e=m.cartId;if(!e)throw new u;return await r({options:{variables:{cartId:e,email:t}},path:"setGuestEmailOnCart.cart",query:h,queueName:c.Updates,transformer:f,type:"mutation"})};export{M as g,q as i,N as s};
+//# sourceMappingURL=setGuestEmailOnCart.js.map

@@ -1,4 +1,4 @@
-/*! Copyright 2025 Adobe
+/*! Copyright 2026 Adobe
 All Rights Reserved. */
 const e=`
   fragment BASIC_CUSTOMER_INFO_FRAGMENT on Customer {
@@ -33,6 +33,10 @@ const e=`
 `,a=`
   fragment ORDER_SUMMARY_FRAGMENT on OrderTotal {
     grand_total {
+      value
+      currency
+    }
+    grand_total_excl_tax {
       value
       currency
     }
@@ -73,3 +77,4 @@ const e=`
     }
   }
 `;export{t as ADDRESS_FRAGMENT,e as BASIC_CUSTOMER_INFO_FRAGMENT,a as ORDER_SUMMARY_FRAGMENT};
+//# sourceMappingURL=fragments.js.map

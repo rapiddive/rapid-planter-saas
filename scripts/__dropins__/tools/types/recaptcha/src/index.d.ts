@@ -3,6 +3,7 @@ import { ReCaptchaV3Response, PropsFormTypes, ReCaptchaV3Model } from './types/r
 export declare const recaptchaFetchApi: {
     setEndpoint: (endpoint: string) => void;
     setFetchGraphQlHeader: (key: string, value: string | null) => void;
+    getFetchGraphQlHeader: (key: string) => string | null | undefined;
     removeFetchGraphQlHeader: (key: string) => void;
     setFetchGraphQlHeaders: (header: import('@adobe-commerce/fetch-graphql').Header | ((prev: import('@adobe-commerce/fetch-graphql').Header) => import('@adobe-commerce/fetch-graphql').Header)) => void;
     fetchGraphQl: <T = any>(query: string, options?: import('@adobe-commerce/fetch-graphql').FetchOptions | undefined) => Promise<{
@@ -13,6 +14,8 @@ export declare const recaptchaFetchApi: {
         endpoint: string | undefined;
         fetchGraphQlHeaders: import('@adobe-commerce/fetch-graphql').Header;
     };
+    addBeforeHook: (hook: import('@adobe-commerce/fetch-graphql').BeforeHook) => void;
+    addAfterHook: (hook: import('@adobe-commerce/fetch-graphql').AfterHook<any>) => void;
 };
 export declare class RecaptchaModule {
     _enableReCAPTCHA: boolean;

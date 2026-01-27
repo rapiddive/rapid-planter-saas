@@ -14,8 +14,8 @@ export interface OrderItemProps {
     quantity_ordered?: number;
     quantity_shipped?: number;
     quantity_invoiced?: number;
-    url_key: string;
-    sku: string;
+    product_url_key: string;
+    product_sku: string;
     status: string;
     product_name: string;
     id: string;
@@ -36,6 +36,7 @@ export interface DiscountProps {
 }
 export interface TotalProps {
     grand_total: AmountProps;
+    grand_total_excl_tax: AmountProps;
     subtotal: AmountProps;
     taxes: TaxProps[];
     total_tax: AmountProps;
