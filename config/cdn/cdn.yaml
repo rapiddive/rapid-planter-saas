@@ -1,0 +1,17 @@
+version: "1"
+data:
+  trafficFilters:
+    rules:
+      # Allow only specific IP ranges for this ACCS/EDS domain
+      - name: allow-accs-vpn
+        when:
+          allOf:
+            - { reqProperty: domain,  equals: "accs.example.com" }
+            - { reqProperty: clientIp, in: ["203.0.113.0/24", "198.51.100.10/32"] }
+        action: allow
+
+      # Block everyone else hitting that domain
+      - name: block-accs-others
+        when:
+          { reqProperty: domain, equals: "accs.example.com" }
+        action: block
